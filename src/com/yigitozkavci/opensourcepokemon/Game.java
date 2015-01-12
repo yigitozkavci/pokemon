@@ -1,5 +1,8 @@
+package com.yigitozkavci.opensourcepokemon;
 import java.util.Scanner;
 import java.util.Random;
+
+import com.yigitozkavci.opensourcepokemon.pokemons.Pokemon;
 public class Game {
 	String gameState = "Pokemon Select";
 	boolean isPokemonSelected;
