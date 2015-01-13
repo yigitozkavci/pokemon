@@ -2,6 +2,7 @@ package com.yigitozkavci.opensourcepokemon.pokemons;
 import java.util.Random;
 
 import com.yigitozkavci.opensourcepokemon.pokemons.attacks.Attack;
+import com.yigitozkavci.opensourcepokemon.pokemons.attacks.EggBomb;
 import com.yigitozkavci.opensourcepokemon.pokemons.attacks.Tackle;
 
 
@@ -17,58 +18,53 @@ public class Pokemon {
 		TYPE_PSYSIC
 	}
 	
-	private Attack[] attacks = new Attack[4];
-	
+	private Attack[] attacks = new Attack[2];
 	private PokemonType type;
 	private String name;
-	private int attack, defense, health;
-	public Pokemon(String name, PokemonType type, int attack, int defense, int health){
+	private int defense, health;
+	public Pokemon(String name, PokemonType type, int defense, int health){
 		this.name = name;
 		this.type = type;
-		this.attack = attack;
+		
+		
+		attacks[0] = new Tackle();
+		attacks[1] = new EggBomb();
 		this.defense = defense;
 		this.health = health;
-		if(!name.equals("Magikarp"))
-		{
-			attacks[0] = new Tackle();
-		}
 	}
+	/*
+	 * @return List of all Pokemons.
+	 */
 	public static Pokemon[] getPokemons(){
 		if(pokemons != null)
 		{
 			return pokemons;
 		}
 		return pokemons = new Pokemon[]{
-			new Pokemon("Bulbasaur", PokemonType.TYPE_GRASS, 60, 60, 200),
-			new Pokemon("Blastoise", PokemonType.TYPE_WATER, 60, 60, 200),
-			new Pokemon("Charizard", PokemonType.TYPE_FIRE, 60, 60, 200),
-			new Pokemon("Alakazam", PokemonType.TYPE_PSYSIC, 60, 60, 200),
-			new Pokemon("Snorlax", PokemonType.TYPE_NORMAL, 60, 60, 200),
-			new Pokemon("Starly", PokemonType.TYPE_WATER, 60, 60, 200)
+			new Pokemon("Bulbasaur", PokemonType.TYPE_GRASS, 60, 200),
+			new Pokemon("Blastoise", PokemonType.TYPE_WATER, 60, 200),
+			new Pokemon("Charizard", PokemonType.TYPE_FIRE, 60, 200),
+			new Pokemon("Alakazam", PokemonType.TYPE_PSYSIC, 60, 200),
+			new Pokemon("Snorlax", PokemonType.TYPE_NORMAL, 60, 200),
+			new Pokemon("Starly", PokemonType.TYPE_WATER, 60, 200)
 		};
 	}
-	public void inflictDamage(int amount){
-		this.defense -= amount;
-	}
-	public void attackPokemon(Pokemon foe){
-		if(attack > foe.defense/3){
-			foe.health -= attack - foe.defense/3;
+	public float attackPokemon(Pokemon foe, Attack attack){
+		Random rand = new Random();
+		float damage = attack.getDamage()+rand.nextInt(attack.getDamageInterval());
+		float netDamage = 0;
+		if(damage > foe.defense/3){
+			netDamage = damage - foe.defense/3;
+			foe.health -= netDamage;
 		}
-		if(foe.health <= 0){
-			return;
-		}
-		if(foe.attack > defense/3){
-			health -= foe.attack - foe.defense/3;
-		}
-		return;
+		return netDamage;
 	}
 	public void showStats(){
-		System.out.print("\nStats of "+name+" | Attack: "+attack+" Defense: "
+		System.out.print("\nStats of "+name+" | Defense: "
 	+defense+" Health: "+health);
 	}
 	public void decreaseStats(){
 		Random rand = new Random();
-		attack -= 1+rand.nextInt(4);
 		defense -= 1+rand.nextInt(4);
 	}
 	public static Pokemon getPokemon(int id){
@@ -77,9 +73,8 @@ public class Pokemon {
 	public static Pokemon createNaturalPokemon(int level){
 		Random rand = new Random();
 		int health = level*60 + rand.nextInt(level*60);
-		int damage = 25 + rand.nextInt(level*10);
 		int defense = 35 + rand.nextInt(level*10);
-		return new Pokemon("Natural", PokemonType.TYPE_GRASS, damage, defense, health);
+		return new Pokemon("Natural", PokemonType.TYPE_GRASS, defense, health);
 	}
 	public String getName(){
 		return name;
@@ -87,8 +82,8 @@ public class Pokemon {
 	public PokemonType getType(){
 		return type;
 	}
-	public int getAttack(){
-		return attack;
+	public Attack[] getAttacks(){
+		return attacks;
 	}
 	public int getDefense(){
 		return defense;

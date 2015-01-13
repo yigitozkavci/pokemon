@@ -3,6 +3,7 @@ import java.util.Scanner;
 import java.util.Random;
 
 import com.yigitozkavci.opensourcepokemon.pokemons.Pokemon;
+import com.yigitozkavci.opensourcepokemon.pokemons.attacks.Attack;
 public class Game {
 	String gameState = "Pokemon Select";
 	boolean isPokemonSelected;
@@ -97,23 +98,32 @@ public class Game {
 		foe.showStats(); System.out.print("(Level: "+naturalLevel+")");
 		Random rand = new Random();
 		String fightStatus = "Fighting";
-		
 		Scanner scan = new Scanner(System.in);
 		while(player.getHealth() > 0 && foe.getHealth() > 0){
 			System.out.println();
 			System.out.println("1) Attack it(will hurt you but reward exp points.");
 			System.out.println("2) Run(will couse you to lose atk & def stats.)");
-			int attackMove = scan.nextInt();
+			int battleMove = scan.nextInt();
 			
 			
-			if(attackMove == 1){
-				player.attackPokemon(foe);
-				System.out.println("Attacked.");
+			if(battleMove == 1){
+				for(int i = 0; i<player.getAttacks().length; i++){
+					System.out.println((i+1)+") "+player.getAttacks()[i].getName()+"\n");
+				}
+				int attackMove = scan.nextInt();
+				Attack usedAttack = player.getAttacks()[attackMove-1];
+				float damageInflicted = player.attackPokemon(foe, usedAttack);
+				System.out.println("You used: "+usedAttack.getName()+", Damage Inflicted: "+damageInflicted);
+				
+				Attack takenAttack = foe.getAttacks()[rand.nextInt(foe.getAttacks().length)];
+				float damageTaken = foe.attackPokemon(player, takenAttack);
+				System.out.println(foe.getName()+" Used: "+takenAttack.getName()+", Damage Taken: "+damageTaken);
+				
 				player.showStats(); 
 				foe.showStats(); System.out.print("(Level: "+naturalLevel+")");
 				continue;
 			}
-			else if(attackMove == 2){
+			else if(battleMove == 2){
 				player.decreaseStats();
 				fightStatus = "Given up";
 				break;
@@ -137,7 +147,7 @@ public class Game {
 		System.out.println("Pokemon: "+selectedPokemon.getName()+"("+
 		selectedPokemon.getType()+") HP: "+selectedPokemon.getHealth());
 		
-		System.out.println("Attack: "+selectedPokemon.getAttack()+" Defense: "+
+		System.out.println(" Defense: "+
 		selectedPokemon.getDefense());
 		
 		System.out.println("Level: "+pokemonLevel+" XP: "+pokemonExp);

@@ -40,14 +40,14 @@ public abstract class Attack {
 	private float damage;
 	private float levelMult;
 	private DamageType damageType;
-	
+	private int damageInterval;
 	/**
 	 * <p>Special method is implemented if {@link Pokemon} has a special effect on use of
 	 * this attack. (Drain attack, absorbs health from opposing {@link Pokemon} according to
 	 * the total damage dealt.)</p>
 	 * @return if the special method is used successfully.
 	 */
-	public boolean special() {
+	public boolean isSpecial() {
 		return false;
 	}
 	/**
@@ -58,7 +58,6 @@ public abstract class Attack {
 	public boolean specialEveryTurn() {
 		return false;
 	}
-	
 	public String getName() {
 		return name;
 	}
@@ -70,6 +69,12 @@ public abstract class Attack {
 	}
 	public void setDamage(float damage) {
 		this.damage = damage;
+	}
+	public int getDamageInterval(){
+		return damageInterval;
+	}
+	public void setDamageInterval(int damageInterval){
+		this.damageInterval = damageInterval;
 	}
 	public DamageType getDamageType() {
 		return damageType;
@@ -83,6 +88,4 @@ public abstract class Attack {
 	public void setLevelMult(float levelMult) {
 		this.levelMult = levelMult;
 	}
-	
-	
 }
