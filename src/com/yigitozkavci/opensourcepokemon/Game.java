@@ -5,7 +5,6 @@ import java.util.Random;
 import com.yigitozkavci.opensourcepokemon.pokemons.Pokemon;
 import com.yigitozkavci.opensourcepokemon.pokemons.attacks.Attack;
 public class Game {
-	String gameState = "Pokemon Select";
 	boolean isPokemonSelected;
 	Pokemon selectedPokemon;
 	int pokemonLevel = 1;
@@ -15,11 +14,35 @@ public class Game {
 	}
 	public void start(){
 		openMenu("Pokemon Select");
-		openMenu("Take Action");
 	}
+	/**
+	 * <p>Opens the main recursive non-ending menu and game starts. </p>
+	 * <p>Phases: </p>
+	 * <ul>
+	 * 		<li>
+	 * 			<p><b>Pokemon Select: </b>This is the first game phase, where player chooses his/her pokemon
+	 * 			and adventure begins.(Next Phase: "Free")</p>
+	 * 		</li>
+	 * 		<li>
+	 * 			<p><b>Free: </b>In this phase, player is allowed to move freely. He/she may move,
+	 * 			request pokemon status or exit the game. If he/she moves, he may encounter a
+	 * 			skeleton (Next Phase: "Skeleton Fight"), a pokemon (Next Phase: "Pokemon Fight");
+	 * 			find an item(Next Phase:"Found Chest") or find nothing(Next Phase: "Free"). </p>
+	 * 		</li>
+	 * 		<li>
+	 * 			<p><b>Skeleton Fight: </b>In this phase, player either fights to skeleton(Next Phase: "Free")
+	 * 			or runs away(Next Phase: "Free").</p>
+	 * 		</li>
+	 * 		<li>
+	 * 			<p><b>Pokemon Fight: </b>In this phase, player either fights to pokemon in order to capture or
+	 * 			kill it(Next Phase: "Free") or runs away(Next Phase: "Free").</p>
+	 * 		</li>
+	 * </ul>
+	 */
 	public void openMenu(String query){
 		Scanner scan = new Scanner(System.in);
 		Random rand = new Random();
+		gameControl();
 		if(query == "Pokemon Select"){
 			System.out.println("Select your pokemon:");
 			int i = 0;
@@ -33,8 +56,8 @@ public class Game {
 					Pokemon selectedPokemon = Pokemon.getPokemon(pokemonSelectInput-1);
 					this.isPokemonSelected = true;
 					this.selectedPokemon = selectedPokemon;
-					gameState = "Free";
 					System.out.println("You have selected: "+selectedPokemon.getName());
+					openMenu("Free");
 				}
 				else{
 					System.out.println("Wrong input. Try again.");
@@ -46,54 +69,72 @@ public class Game {
 				openMenu("Pokemon Select");
 			}
 		}
-		if(query == "Take Action"){
-			if(gameState == "Free"){
-				System.out.println("\nWhat do you want to do?");
-				System.out.println("1) Move Around 2) Show Pokemon Status 3) Exit Game");
-				if(scan.hasNextInt()){
-					int selectedMove = scan.nextInt();
-					if(selectedMove == 1){
-						if(rand.nextInt(100)>30){
-							gameState = "Encounter";
-							openMenu("Take Action");
-						}
-						else{
-							System.out.println("You're walking . . and nothing happens . .");
-							openMenu("Take Action");
-						}
+		else if(query == "Free"){
+			System.out.println("\nWhat do you want to do?");
+			System.out.println("1) Move Around 2) Show Pokemon Status 3) Exit Game");
+			if(scan.hasNextInt()){
+				int selectedMove = scan.nextInt();
+				if(selectedMove == 1){
+					int walkEncounter = 1+rand.nextInt(100);
+					if(walkEncounter>0 && walkEncounter<=20){
+						openMenu("Pokemon Fight");
 					}
-					else if(selectedMove == 2){
-						requestPokemonStatus();
-						openMenu("Take Action");
+					else if(walkEncounter>20 && walkEncounter<=50){
+						openMenu("Skeleton Fight");
 					}
-					else if(selectedMove == 3){
-						System.exit(0);
+					else if(walkEncounter>50 && walkEncounter<=70){
+						
 					}
 					else{
-						System.out.println("Wrong input. Try again.");
-						openMenu("Take Action");
+						System.out.println("You're walking . . and nothing happens . .");
+						openMenu("Free");
 					}
+				}
+				else if(selectedMove == 2){
+					requestPokemonStatus();
+					openMenu("Free");
+				}
+				else if(selectedMove == 3){
+					System.exit(0);
 				}
 				else{
 					System.out.println("Wrong input. Try again.");
 					openMenu("Take Action");
 				}
 			}
-			else if(gameState == "Encounter"){
-				System.out.println("-- BATTLE --");
-				int naturalLevel = 1+rand.nextInt(3);
-				Pokemon naturalPokemon = Pokemon.createNaturalPokemon(naturalLevel);
-
-				beginBattle(selectedPokemon, naturalPokemon, naturalLevel);
-				
+			else{
+				System.out.println("Wrong input. Try again.");
+				openMenu("Take Action");
 			}
+		}else if(query == "Skeleton Fight"){
+			System.out.println("Skeleton fight coming here.");
+			openMenu("Free");
+		}else if(query == "Pokemon Fight"){
+			System.out.println("-- BATTLE --");
+			int naturalLevel = 3+rand.nextInt(3);
+			Pokemon naturalPokemon = Pokemon.createNaturalPokemon(naturalLevel);
+			beginPokemonBattle(selectedPokemon, naturalPokemon, naturalLevel);
+			openMenu("Free");
 		}
 	}
 	/**
-	 * @param p1 Player 1 for the battle.
-	 * @param p2 Player 2 for the battle.
+	 * 
 	 */
-	public void beginBattle(Pokemon player, Pokemon foe, int naturalLevel){
+	public void gameControl(){
+		if(selectedPokemon.getHealth() <= 0){
+			System.out.println("Your Pokemon Has Died.");
+			System.exit(0);
+		}
+	}
+	/**
+	 * <p>Begins battle between the player's pokemon and the natural Pokemon. 
+	 * Because there is no capture functionality yet, player either kills it
+	 * or runs away. </p>
+	 *  
+	 * @param player Player.
+	 * @param foe Neutral pokemon which player is facing with.
+	 */
+	public void beginPokemonBattle(Pokemon player, Pokemon foe, int naturalLevel){
 		player.showStats();
 		foe.showStats(); System.out.print("(Level: "+naturalLevel+")");
 		Random rand = new Random();
@@ -129,6 +170,7 @@ public class Game {
 				break;
 			}
 		}
+		
 		int XP;
 		if(fightStatus == "Fighting"){
 			XP = rand.nextInt(10)+naturalLevel*20;
@@ -138,9 +180,10 @@ public class Game {
 		
 		System.out.println("\nBattle Over[XP Gained: "+XP+" XP]");
 		gainExp(XP);
-		gameState = "Free";
-		openMenu("Take Action");
 	}
+	/**
+	 * Prints whole data about the Pokemon player chose.
+	 */
 	public void requestPokemonStatus(){
 		System.out.println("\n--- Pokemon Stats ---");
 		
@@ -163,9 +206,3 @@ public class Game {
 		}
 	}
 }
-/* Start by choosing a pokemon with a list.
- * 
- * 
- * 
- * 
- */
