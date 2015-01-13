@@ -2,6 +2,7 @@ package com.yigitozkavci.opensourcepokemon.pokemons;
 import java.util.Random;
 
 import com.yigitozkavci.opensourcepokemon.pokemons.attacks.Attack;
+import com.yigitozkavci.opensourcepokemon.pokemons.attacks.Tackle;
 
 
 public class Pokemon {
@@ -29,7 +30,7 @@ public class Pokemon {
 		this.health = health;
 		if(!name.equals("Magikarp"))
 		{
-			attacks[0] = new Attack();
+			attacks[0] = new Tackle();
 		}
 	}
 	public static Pokemon[] getPokemons(){
