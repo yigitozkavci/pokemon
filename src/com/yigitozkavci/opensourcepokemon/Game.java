@@ -42,7 +42,6 @@ public class Game {
 	public void openMenu(String query){
 		Scanner scan = new Scanner(System.in);
 		Random rand = new Random();
-		gameControl();
 		if(query == "Pokemon Select"){
 			System.out.println("Select your pokemon:");
 			int i = 0;
@@ -76,14 +75,15 @@ public class Game {
 				int selectedMove = scan.nextInt();
 				if(selectedMove == 1){
 					int walkEncounter = 1+rand.nextInt(100);
-					if(walkEncounter>0 && walkEncounter<=20){
+					if(walkEncounter>0 && walkEncounter<=10){
 						openMenu("Pokemon Fight");
 					}
-					else if(walkEncounter>20 && walkEncounter<=50){
+					else if(walkEncounter>10 && walkEncounter<=30){
 						openMenu("Skeleton Fight");
 					}
-					else if(walkEncounter>50 && walkEncounter<=70){
-						
+					else if(walkEncounter>30 && walkEncounter<=50){
+						System.out.println("You've found an item!");
+						openMenu("Free");
 					}
 					else{
 						System.out.println("You're walking . . and nothing happens . .");
@@ -99,12 +99,12 @@ public class Game {
 				}
 				else{
 					System.out.println("Wrong input. Try again.");
-					openMenu("Take Action");
+					openMenu("Free");
 				}
 			}
 			else{
 				System.out.println("Wrong input. Try again.");
-				openMenu("Take Action");
+				openMenu("Free");
 			}
 		}else if(query == "Skeleton Fight"){
 			System.out.println("Skeleton fight coming here.");
@@ -116,14 +116,8 @@ public class Game {
 			beginPokemonBattle(selectedPokemon, naturalPokemon, naturalLevel);
 			openMenu("Free");
 		}
-	}
-	/**
-	 * 
-	 */
-	public void gameControl(){
-		if(selectedPokemon.getHealth() <= 0){
-			System.out.println("Your Pokemon Has Died.");
-			System.exit(0);
+		else{
+			System.out.println("Wow Haram");
 		}
 	}
 	/**
