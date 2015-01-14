@@ -24,7 +24,7 @@ import com.yigitozkavci.opensourcepokemon.pokemons.Pokemon;
  * <p>Every {@link Pokemon} can learn up to 4 attacks. To learn an additional type of attack he/she
  * should forget one of his/her attacks.</p>
  * 
- * @author KaracaSoft
+ * @author Mahmut Karaca
  *
  */
 public abstract class Attack {

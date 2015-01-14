@@ -2,11 +2,23 @@ package com.yigitozkavci.opensourcepokemon;
 import java.util.Scanner;
 import java.util.Random;
 
+import com.yigitozkavci.opensourcepokemon.nautrals.Neutral;
+import com.yigitozkavci.opensourcepokemon.nautrals.Skeleton;
 import com.yigitozkavci.opensourcepokemon.pokemons.Pokemon;
 import com.yigitozkavci.opensourcepokemon.pokemons.attacks.Attack;
+/**
+ * <p>Main game class where everything starts and everything ends. Managing {@code Pokemon Select} and 
+ * menu {@code openMenu} recursion which will be documented by its own.</p>
+ * @author Yiðit Özkavcý
+ */
 public class Game {
 	boolean isPokemonSelected;
 	Pokemon selectedPokemon;
+	public enum fightStatus{
+		STATUS_FIGHTING,
+		STATUS_GIVEN_UP,
+		STATUS_OVER
+	}
 	int pokemonLevel = 1;
 	int pokemonExp = 0;
 	public Game(){
@@ -17,7 +29,7 @@ public class Game {
 	}
 	/**
 	 * <p>Opens the main recursive non-ending menu and game starts. </p>
-	 * <p>Phases: </p>
+	 * <p><b>Phases: </b></p>
 	 * <ul>
 	 * 		<li>
 	 * 			<p><b>Pokemon Select: </b>This is the first game phase, where player chooses his/her pokemon
@@ -38,6 +50,8 @@ public class Game {
 	 * 			kill it(Next Phase: "Free") or runs away(Next Phase: "Free").</p>
 	 * 		</li>
 	 * </ul>
+	 * @author Yiðit Özkavcý
+	 * @param query Phase name to pass through menu function.
 	 */
 	public void openMenu(String query){
 		Scanner scan = new Scanner(System.in);
@@ -107,13 +121,13 @@ public class Game {
 				openMenu("Free");
 			}
 		}else if(query == "Skeleton Fight"){
-			System.out.println("Skeleton fight coming here.");
+			beginNeutralBattle(selectedPokemon, new Skeleton(1+rand.nextInt(3)));
 			openMenu("Free");
 		}else if(query == "Pokemon Fight"){
 			System.out.println("-- BATTLE --");
-			int naturalLevel = 3+rand.nextInt(3);
-			Pokemon naturalPokemon = Pokemon.createNaturalPokemon(naturalLevel);
-			beginPokemonBattle(selectedPokemon, naturalPokemon, naturalLevel);
+			int neutralLevel = 3+rand.nextInt(3);
+			Pokemon neutralPokemon = Pokemon.createNaturalPokemon(neutralLevel);
+			beginPokemonBattle(selectedPokemon, neutralPokemon, neutralLevel);
 			openMenu("Free");
 		}
 		else{
@@ -121,26 +135,26 @@ public class Game {
 		}
 	}
 	/**
-	 * <p>Begins battle between the player's pokemon and the natural Pokemon. 
+	 * <p>Begins battle between the player's pokemon and the neutral Pokemon. 
 	 * Because there is no capture functionality yet, player either kills it
 	 * or runs away. </p>
 	 *  
 	 * @param player Player.
 	 * @param foe Neutral pokemon which player is facing with.
+	 * @param neutralLevel Level of the neutral pokemon. Will be used to scale it's defense and health.
+	 * @author Yiðit Özkavcý
 	 */
-	public void beginPokemonBattle(Pokemon player, Pokemon foe, int naturalLevel){
+	public void beginPokemonBattle(Pokemon player, Pokemon foe, int neutralLevel){
 		player.showStats();
-		foe.showStats(); System.out.print("(Level: "+naturalLevel+")");
+		foe.showStats(); System.out.print("(Level: "+neutralLevel+")");
 		Random rand = new Random();
-		String fightStatus = "Fighting";
+		fightStatus pokemonBattleStatus = fightStatus.STATUS_FIGHTING;
 		Scanner scan = new Scanner(System.in);
 		while(player.getHealth() > 0 && foe.getHealth() > 0){
 			System.out.println();
 			System.out.println("1) Attack it(will hurt you but reward exp points.");
 			System.out.println("2) Run(will couse you to lose atk & def stats.)");
 			int battleMove = scan.nextInt();
-			
-			
 			if(battleMove == 1){
 				for(int i = 0; i<player.getAttacks().length; i++){
 					System.out.println((i+1)+") "+player.getAttacks()[i].getName()+"\n");
@@ -155,25 +169,37 @@ public class Game {
 				System.out.println(foe.getName()+" Used: "+takenAttack.getName()+", Damage Taken: "+damageTaken);
 				
 				player.showStats(); 
-				foe.showStats(); System.out.print("(Level: "+naturalLevel+")");
+				foe.showStats(); System.out.print("(Level: "+neutralLevel+")");
 				continue;
 			}
 			else if(battleMove == 2){
 				player.decreaseStats();
-				fightStatus = "Given up";
+				pokemonBattleStatus = fightStatus.STATUS_GIVEN_UP;
 				break;
 			}
 		}
 		
 		int XP;
-		if(fightStatus == "Fighting"){
-			XP = rand.nextInt(10)+naturalLevel*20;
+		if(pokemonBattleStatus == fightStatus.STATUS_FIGHTING){
+			XP = rand.nextInt(10)+neutralLevel*20;
 		}else{
 			XP = 0;
 		}
-		
+		pokemonBattleStatus = fightStatus.STATUS_OVER;
 		System.out.println("\nBattle Over[XP Gained: "+XP+" XP]");
 		gainExp(XP);
+	}
+	/**
+	 * Begins the battle between player and a {@link Neutral}. Player uses an {@link Attack} on {@link Neutral}
+	 * as its move, and {@link Neutral} attacks back with an {@code attack} amount of which is being determined
+	 * by its {@code level}.
+	 * @param player Player
+	 * @param neutral Neutral
+	 * @author Yiðit Özkavcý
+	 */
+	public void beginNeutralBattle(Pokemon player, Neutral neutral){
+		fightStatus neutralBattleStatus = fightStatus.STATUS_FIGHTING;
+		
 	}
 	/**
 	 * Prints whole data about the Pokemon player chose.

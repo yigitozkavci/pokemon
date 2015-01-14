@@ -1,6 +1,7 @@
 package com.yigitozkavci.opensourcepokemon.pokemons;
 import java.util.Random;
 
+import com.yigitozkavci.opensourcepokemon.nautrals.Neutral;
 import com.yigitozkavci.opensourcepokemon.pokemons.attacks.Attack;
 import com.yigitozkavci.opensourcepokemon.pokemons.attacks.EggBomb;
 import com.yigitozkavci.opensourcepokemon.pokemons.attacks.Tackle;
@@ -59,6 +60,16 @@ public class Pokemon {
 		}
 		return netDamage;
 	}
+	public float attackNeutral(Neutral foe, Attack attack){
+		Random rand = new Random();
+		float damage = attack.getDamage()+rand.nextInt(attack.getDamageInterval());
+		float netDamage = 0;
+		if(damage > foe.getDefense()/3){
+			netDamage = damage - foe.getDefense()/3;
+			foe.setHealth(foe.getHealth() - netDamage);
+		}
+		return netDamage;
+	}
 	public void showStats(){
 		System.out.print("\nStats of "+name+" | Defense: "
 	+defense+" Health: "+health);
@@ -91,6 +102,8 @@ public class Pokemon {
 	public int getHealth(){
 		return health;
 	}
-	
+	public void setHealth(int health){
+		this.health = health;
+	}
 	
 }
